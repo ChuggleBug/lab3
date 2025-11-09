@@ -4,6 +4,7 @@
 #include <BLEUtils.h>
 
 #include "ble_svc.h"
+#include "app_led.h"
 
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 #define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
@@ -15,14 +16,21 @@ BLECharacteristic *pCharacteristic = NULL;
 
 void AppBLECharCallbacks::onWrite(BLECharacteristic *pCharacteristic) {
   std::string value = pCharacteristic->getValue();
-  if (value.length() > 0) {
-    Serial.println("*********");
-    Serial.print("New value: ");
-    for (const auto &c : value) {
-      Serial.print(c);
-    }
+  if (value.length() < 1) {
+    return;
+  }
+  if (value == "on") {
+    Serial.println("Turning led ON");
+    app_led_on();
+  }
+  else if (value == "off")
+  {
+    Serial.println("Turning led OFF");
+    app_led_off();
+  }
+  else {
+    Serial.printf("Unknown command \"%s\"", value.c_str());
     Serial.println();
-    Serial.println("*********");
   }
 }
 
@@ -45,7 +53,7 @@ void app_ble_svc_init() {
 
   pCharacteristic = pService->createCharacteristic(
       CHARACTERISTIC_UUID,
-      BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
+      BLECharacteristic::PROPERTY_WRITE);
   pCharacteristic->setCallbacks(new AppBLECharCallbacks());
   pCharacteristic->setValue("Hello World");
 
