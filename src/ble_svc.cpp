@@ -3,6 +3,7 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 
+#include "main.h"
 #include "ble_svc.h"
 
 #define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
@@ -13,17 +14,9 @@ BLEService *pService = NULL;
 BLEAdvertising *pAdvertising = NULL;
 BLECharacteristic *pCharacteristic = NULL;
 
-void AppBLECharCallbacks::onWrite(BLECharacteristic *pCharacteristic) {
-  std::string value = pCharacteristic->getValue();
-  if (value.length() > 0) {
-    Serial.println("*********");
-    Serial.print("New value: ");
-    for (const auto &c : value) {
-      Serial.print(c);
-    }
-    Serial.println();
-    Serial.println("*********");
-  }
+void AppBLECharCallbacks::onRead(BLECharacteristic *pCharacteristic) {
+  String value = "Step count: " + String(stepCount);
+  pCharacteristic->setValue(value.c_str());
 }
 
 void AppBLESrvCallbacks::onConnect(BLEServer *pServer) {
@@ -45,7 +38,7 @@ void app_ble_svc_init() {
 
   pCharacteristic = pService->createCharacteristic(
       CHARACTERISTIC_UUID,
-      BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
+      BLECharacteristic::PROPERTY_READ);
   pCharacteristic->setCallbacks(new AppBLECharCallbacks());
   pCharacteristic->setValue("Hello World");
 

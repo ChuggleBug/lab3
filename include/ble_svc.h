@@ -11,7 +11,7 @@
 
 class AppBLECharCallbacks : public BLECharacteristicCallbacks {
    public:
-    void onWrite(BLECharacteristic *pCharacteristic) override;
+    void onRead(BLECharacteristic *pCharacteristic) override;
 };
 
 class AppBLESrvCallbacks : public BLEServerCallbacks {
@@ -19,7 +19,6 @@ class AppBLESrvCallbacks : public BLEServerCallbacks {
 
     void onDisconnect(BLEServer* pServer) override;
 };
-
 
 void app_ble_svc_init();
 
